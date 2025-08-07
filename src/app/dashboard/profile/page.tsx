@@ -3,20 +3,21 @@ import { Input } from "@/components/ui/input";
 import Dashboard from "../components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { apiCall } from "@/helper/apiCall";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
   updateProfileSchema,
   UpdateProfileSchema,
 } from "@/helper/updateProfile";
 import { useForm } from "react-hook-form";
+import { Update } from "next/dist/build/swc/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { error } from "console";
 import { toast } from "react-toastify";
-import LoadingPage from "@/app/components/LoadingPage";
 
 function ProfileSettings() {
   // loading screen
-  const [localLoading, setLocalLoading] = useState(false);
+
   // zod update schema
   const {
     register,
@@ -66,16 +67,24 @@ function ProfileSettings() {
         autoClose: 1000,
       });
     } catch (error) {
-      toast.error("Something Wrong, Failed Update");
       console.log(error);
     }
   };
 
-  const { referral_code, setUserProfile } = useUserStore();
+  const {
+    first_name,
+    last_name,
+    email,
+    organizer_name,
+    phone_number,
+    referral_code,
+    isVerified,
+    avatar,
+    setUserProfile,
+  } = useUserStore();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      setLocalLoading(true);
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
@@ -85,15 +94,7 @@ function ProfileSettings() {
         });
 
         const data = res.data.result;
-        const organizerName = data.organizer?.organizer_name || "";
-
-        reset({
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          phone_number: data.phone_number,
-          organizer_name: organizerName,
-        });
+        const organizerName = data.organizer?.[0]?.organizer_name || "";
 
         setUserProfile({
           first_name: data.first_name,
@@ -104,19 +105,21 @@ function ProfileSettings() {
           organizer_name: organizerName,
           isVerified: data.isVerified,
         });
+
+        reset({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          phone_number: data.phone_number,
+          organizer_name: organizerName,
+        });
       } catch (error) {
         console.error(error);
-      } finally {
-        setLocalLoading(false);
       }
     };
 
     fetchUserData();
   }, [reset, setUserProfile]);
-
-  if (localLoading) {
-    return <LoadingPage></LoadingPage>;
-  }
 
   return (
     <section>
@@ -211,7 +214,7 @@ function ProfileSettings() {
             <label>Refferal Code</label>
             <Input
               className="bg-white"
-              value={referral_code ?? ""}
+              defaultValue={referral_code}
               disabled
             ></Input>
           </div>

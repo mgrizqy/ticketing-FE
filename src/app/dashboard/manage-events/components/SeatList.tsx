@@ -18,7 +18,6 @@ import {
 import EditSeats from "./core-comps/EditSeats";
 import { useEffect, useState } from "react";
 import { apiCall } from "@/helper/apiCall";
-import LoadingPage from "@/app/components/LoadingPage";
 
 interface ISeatsProps {
   id: string;
@@ -38,9 +37,6 @@ function SeatList() {
   const [editSelectedSeats, setEditSelectedSeats] =
     useState<ISeatsProps | null>(null);
 
-  // loading
-  const [localLoading, setLocalLoading] = useState(false);
-
   // handler edit
   const handlerEditSeats = (seatsData: ISeatsProps) => {
     setEditSelectedSeats(seatsData);
@@ -50,7 +46,6 @@ function SeatList() {
   // get Data from db
   const getSeatsData = async () => {
     try {
-      setLocalLoading(true);
       const token = localStorage.getItem("token");
       if (!token) return;
       const res = await apiCall.get("/events/attendance", {
@@ -60,18 +55,12 @@ function SeatList() {
       setSeats(eventData);
     } catch (error) {
       console.log(error);
-    } finally {
-      setLocalLoading(false);
     }
   };
 
   useEffect(() => {
     getSeatsData();
   }, []);
-
-  if (localLoading) {
-    return <LoadingPage></LoadingPage>;
-  }
 
   return (
     <section>
