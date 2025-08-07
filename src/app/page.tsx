@@ -5,6 +5,7 @@ import FeaturesSection from "./components/FeaturesSection";
 import CTASection from "./components/CTASection";
 import Navbar from "@/components/NavBar";
 import Divider from "@/components/Divider";
+import DevTransactionSimulator from "./components/DevTransactionSim";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
       {/* Arco - end */}
 
       {/* Eky - start */}
-
+      <DevTransactionSimulator />
       <HeroSection />
       <Divider variant="arrow" />
       <EventListSection />

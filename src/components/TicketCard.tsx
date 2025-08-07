@@ -106,10 +106,6 @@ export default function TicketCard({ event }: any) {
     minimumFractionDigits: 0,
   });
 
-  function navigateToPayment() {
-    router.push("/transaction/payment");
-  }
-
   async function getUserData() {
     try {
       const token = localStorage.getItem("token");
@@ -176,13 +172,15 @@ export default function TicketCard({ event }: any) {
         },
       };
 
-      const res = await apiCall.post("/transactions", data, config);
+      const res = await apiCall.post("/transaction", data, config);
 
       const transactionId = res.data.data.id;
+      console.log(transactionId);
       toast.success("Transaction created. Proceed to payment.");
       router.push(`/transaction/payment/${transactionId}`);
     } catch (error: any) {
       toast.error("Failed to create transaction.");
+      console.log(error);
     }
   }
 
@@ -422,7 +420,7 @@ export default function TicketCard({ event }: any) {
         <CardFooter className="">
           <Button
             size="lg"
-            onClick={() => navigateToPayment()}
+            onClick={() => createTransaction()}
             disabled={!isExpanded || discountedTotalPrice <= 0}
             className={`w-full font-poppins cursor-pointer rounded-t-none  font-bold origin-top ${
               isExpanded
