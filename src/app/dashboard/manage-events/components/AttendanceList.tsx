@@ -25,7 +25,6 @@ import {
 import { useEffect, useState } from "react";
 import AttendanceDetails from "./core-comps/AttendanceDetails";
 import { apiCall } from "@/helper/apiCall";
-import LoadingPage from "@/app/components/LoadingPage";
 
 interface IAttendanceDetail {
   invoice: string;
@@ -36,10 +35,8 @@ interface IAttendanceDetail {
 interface IEventsByOrganizerProps {
   id: string;
   name: string;
-  confirmed_attendance_user_invoice: string[];
-  confirmed_attendance_user_name: string[];
-  confirmed_attendance_user_quantity: number[];
   confirmed_attendance_length: number;
+  attendanceDetails?: IAttendanceDetail[]; // opsional
 }
 
 function AttendanceList() {
@@ -58,14 +55,9 @@ function AttendanceList() {
     setCheckAttendance(true);
   };
 
-  console.log(selectedEvents);
-  // loading
-  const [localLoading, setLocalLoading] = useState(false);
-
   // get data from db
   const getEventsbyAttendance = async () => {
     try {
-      setLocalLoading(true);
       const token = localStorage.getItem("token");
       if (!token) return;
       const res = await apiCall.get("/events/attendance", {
@@ -75,18 +67,12 @@ function AttendanceList() {
       setEvents(res.data.data);
     } catch (error) {
       console.log(error);
-    } finally {
-      setLocalLoading(false);
     }
   };
 
   useEffect(() => {
     getEventsbyAttendance();
   }, []);
-
-  if (localLoading) {
-    return <LoadingPage></LoadingPage>;
-  }
 
   return (
     <section>
